@@ -1,0 +1,18 @@
+rules_version = '2';
+// Open rules: anyone with the link can read and add to boards.
+// Fine for team retros; don't put anything confidential on a board.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /boards/{boardId} {
+      allow read, write: if true;
+      match /cards/{cardId} {
+        allow read, delete: if true;
+        allow create, update: if request.resource.data.text is string
+                              && request.resource.data.text.size() <= 500;
+      }
+      match /moods/{personId} {
+        allow read, write: if true;
+      }
+    }
+  }
+}
